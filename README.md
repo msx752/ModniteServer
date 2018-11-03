@@ -1,6 +1,6 @@
 # ModniteServer
 Private server
 
-Coming soon
+Release on November 5, 2018
 
 ![Sneak preview](/sneakpreview.png)
