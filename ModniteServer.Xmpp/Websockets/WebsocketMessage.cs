@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace ModniteServer.Xmpp.Websockets
@@ -9,7 +10,9 @@ namespace ModniteServer.Xmpp.Websockets
     {
         ContinuationFrame,
         Text,
-        Binary
+        Binary,
+        Ping,
+        Pong
     }
 
     internal sealed class WebsocketMessage
@@ -28,21 +31,24 @@ namespace ModniteServer.Xmpp.Websockets
                 //Log.Warning("Invalid Websocket message received from client");
             }
 
+            int maskOffset = 2;
             if (payloadLength == 126)
             {
-                // TODO: next 2 bytes are length
+                payloadLength = (buffer[2] << 8) | buffer[3];
+                maskOffset += 2;
             }
             else if (payloadLength == 127)
             {
-                // TODO: next 4 bytes are length
+                payloadLength = (buffer[2] << 24) | (buffer[3] << 16) | (buffer[4] << 8) | buffer[5];
+                maskOffset += 4;
             }
 
-            byte[] mask = BitConverter.GetBytes(BitConverter.ToInt32(buffer, 2));
+            byte[] mask = BitConverter.GetBytes(BitConverter.ToInt32(buffer, maskOffset));
 
             byte[] decoded = new byte[payloadLength];
             for (int i = 0; i < payloadLength; i++)
             {
-                decoded[i] = (byte)(buffer[i + 6] ^ mask[i % 4]);
+                decoded[i] = (byte)(buffer[i + 4 + maskOffset] ^ mask[i % 4]);
             }
 
             switch (opcode)
@@ -75,17 +81,60 @@ namespace ModniteServer.Xmpp.Websockets
             }
         }
 
-        public MessageType MessageType { get; private set; }
+        internal WebsocketMessage()
+        {
+        }
 
-        public bool IsCompleted { get; private set; }
+        public MessageType MessageType { get; set; }
 
-        public string TextContent { get; private set; }
+        public bool IsCompleted { get; set; }
 
-        public byte[] BinaryContent { get; private set; }
+        public string TextContent { get; set; }
+
+        public byte[] BinaryContent { get; set; }
 
         internal static WebsocketMessage Defragment(IEnumerable<WebsocketMessage> fragments)
         {
+            // TODO
             throw new NotImplementedException();
+        }
+
+        public byte[] Serialize()
+        {
+            using (var stream = new MemoryStream())
+            using (var writer = new BinaryWriter(stream))
+            {
+                if (MessageType == MessageType.Text)
+                {
+                    byte[] textBuffer = Encoding.UTF8.GetBytes(TextContent);
+
+                    if (textBuffer.Length > 0b_0111_1111)
+                    {
+                        throw new NotImplementedException("Content larger than 127 bytes is not supported yet");
+                    }
+
+                    writer.Write((byte)0b_1000_0001);
+                    writer.Write((byte)textBuffer.Length);
+                    writer.Write(textBuffer);
+                }
+                else if (MessageType == MessageType.Binary)
+                {
+                    if (BinaryContent.Length > 0b_0111_1111)
+                    {
+                        throw new NotImplementedException("Content larger than 127 bytes is not supported yet");
+                    }
+
+                    writer.Write((byte)0b_1000_0010);
+                    writer.Write((byte)BinaryContent.Length);
+                    writer.Write(BinaryContent);
+                }
+                else
+                {
+                    throw new NotImplementedException("Other message types are not supported yet");
+                }
+
+                return stream.ToArray();
+            }
         }
 
         public override string ToString()

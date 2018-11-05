@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -55,9 +56,20 @@ namespace ModniteServer.Xmpp.Websockets
             }
         }
 
-        public async Task SendMessageAsync(Socket socket, MessageType messageType, byte[] data)
+        public void SendMessage(Socket socket, MessageType messageType, byte[] data)
         {
-            // todo
+            var message = new WebsocketMessage { MessageType = messageType };
+            if (messageType == MessageType.Text)
+            {
+                message.TextContent = Encoding.UTF8.GetString(data);
+            }
+            else if (messageType == MessageType.Binary)
+            {
+                message.BinaryContent = data;
+            }
+
+            Log.Information($"Sent {data.Length} bytes {{Client}}{{MessageType}}", socket.RemoteEndPoint.ToString(), messageType);
+            socket.Send(message.Serialize());
         }
 
         private async Task AcceptConnectionsAsync()
@@ -122,6 +134,8 @@ namespace ModniteServer.Xmpp.Websockets
 
                     buffer = new byte[client.Available];
                     await stream.ReadAsync(buffer, 0, buffer.Length, _cts.Token);
+
+                    string byteString = BitConverter.ToString(buffer).Replace("-", " ");
 
                     var message = new WebsocketMessage(buffer);
                     if (_messageFragments.Count > 0)

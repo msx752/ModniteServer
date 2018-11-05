@@ -35,7 +35,7 @@ namespace ModniteServer.Xmpp
 
         public void Start() => _server.Start();
 
-        private async void OnMessageReceived(object sender, WebsocketMessageReceivedEventArgs e)
+        private void OnMessageReceived(object sender, WebsocketMessageReceivedEventArgs e)
         {
             var element = XElement.Parse(e.Message.TextContent);
             if (element.Name.LocalName == "open")
@@ -51,7 +51,7 @@ namespace ModniteServer.Xmpp
                     new XAttribute(xml + "lang", "en"),
                     new XAttribute("version", "1.0")
                 );
-                await _server.SendMessageAsync(e.Socket, MessageType.Text, Encoding.UTF8.GetBytes(response.ToString()));
+                _server.SendMessage(e.Socket, MessageType.Text, Encoding.UTF8.GetBytes(response.ToString()));
 
                 _clients.Add(e.Socket.RemoteEndPoint, new XmppClient());
                 Log.Information("New XMPP client {Client}", e.Socket.RemoteEndPoint);
@@ -62,7 +62,7 @@ namespace ModniteServer.Xmpp
                 _clients[e.Socket.RemoteEndPoint].HandleMessage(element, out XElement response);
                 if (response != null)
                 {
-                    await _server.SendMessageAsync(e.Socket, MessageType.Text, Encoding.UTF8.GetBytes(response.ToString()));
+                    _server.SendMessage(e.Socket, MessageType.Text, Encoding.UTF8.GetBytes(response.ToString()));
                 }
             }
         }
