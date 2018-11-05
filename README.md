@@ -3,6 +3,9 @@ Modnite Server is a private server for Fortnite Battle Royale. Since Fortnite Ba
 
 We ❤️ Fortnite and hope this creates an exciting new experience for the game.
 
+![Server screenshot](/docs/screenshot.png)
+![Lobby screenshot](/docs/Version6_10.png)
+
 # Milestones
 ✔️ Enable editing of game files and disable TLS
 
@@ -28,6 +31,9 @@ This is a very early preview. There's not much you can do at this time.
 
 ### How do I create accounts?
 By default, Modnite Server will automatically create new accounts. Simply login with the email `username@modnite.net`. If the username does not exist, a new account will be created.
+
+For example, logging in as `wumbo@modnite.net` will create a new account with the display name set to `wumbo`.
+![Login example](/docs/login.PNG)
 
 Alternatively, you may use the `create` command. For example, `create player123 hunter2`.
 
