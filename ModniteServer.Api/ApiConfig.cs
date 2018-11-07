@@ -11,6 +11,8 @@ namespace ModniteServer
     {
         public const string ConfigFile = @"\config.json";
 
+        public const ushort DefaultApiPort = 60101;
+
         static ApiConfig()
         {
             string location = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -38,7 +40,7 @@ namespace ModniteServer
         /// </summary>
         private ApiConfig()
         {
-            Port = 80;
+            Port = DefaultApiPort;
             AutoCreateAccounts = true;
             MinimumVersionString = "6.10.4464155";
 

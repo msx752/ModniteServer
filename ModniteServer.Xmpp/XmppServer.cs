@@ -3,6 +3,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Xml.Linq;
 
@@ -35,6 +36,20 @@ namespace ModniteServer.Xmpp
 
         public void Start() => _server.Start();
 
+        public void Dispose()
+        {
+            if (!_isDisposed)
+            {
+                _server.Dispose();
+                _isDisposed = true;
+            }
+        }
+
+        internal void SendXmppMessage(Socket socket, XElement message)
+        {
+            _server.SendMessage(socket, MessageType.Text, Encoding.UTF8.GetBytes(message.ToString()));
+        }
+
         private void OnMessageReceived(object sender, WebsocketMessageReceivedEventArgs e)
         {
             var element = XElement.Parse(e.Message.TextContent);
@@ -51,28 +66,18 @@ namespace ModniteServer.Xmpp
                     new XAttribute(xml + "lang", "en"),
                     new XAttribute("version", "1.0")
                 );
-                _server.SendMessage(e.Socket, MessageType.Text, Encoding.UTF8.GetBytes(response.ToString()));
+                SendXmppMessage(e.Socket, response);
 
-                _clients.Add(e.Socket.RemoteEndPoint, new XmppClient());
+                _clients.Add(e.Socket.RemoteEndPoint, new XmppClient(this, e.Socket));
                 Log.Information("New XMPP client {Client}", e.Socket.RemoteEndPoint);
             }
             else
             {
-                Log.Information("[XMPP] " + element);
                 _clients[e.Socket.RemoteEndPoint].HandleMessage(element, out XElement response);
                 if (response != null)
                 {
-                    _server.SendMessage(e.Socket, MessageType.Text, Encoding.UTF8.GetBytes(response.ToString()));
+                    SendXmppMessage(e.Socket, response);
                 }
-            }
-        }
-
-        public void Dispose()
-        {
-            if (!_isDisposed)
-            {
-                _server.Dispose();
-                _isDisposed = true;
             }
         }
     }
