@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <None Update="Assets\ClientSettings.Sav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

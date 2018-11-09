@@ -67,6 +67,10 @@ namespace ModniteServer.Xmpp.Websockets
                     BinaryContent = decoded;
                     break;
 
+                case 8: // close
+                    // todo
+                    break;
+
                 case 9: // ping
                     // todo
                     break;

@@ -69,7 +69,12 @@ namespace ModniteServer.Xmpp.Websockets
             }
 
             Log.Information($"Sent {data.Length} bytes {{Client}}{{MessageType}}", socket.RemoteEndPoint.ToString(), messageType);
-            socket.Send(message.Serialize());
+            using (var stream = new NetworkStream(socket, false))
+            {
+                byte[] buffer = message.Serialize();
+                stream.Write(buffer, 0, buffer.Length);
+                stream.Flush();
+            }
         }
 
         private async Task AcceptConnectionsAsync()
@@ -125,6 +130,7 @@ namespace ModniteServer.Xmpp.Websockets
                 responseBuilder.Append("\r\n");
                 byte[] response = Encoding.UTF8.GetBytes(responseBuilder.ToString());
                 await stream.WriteAsync(response, 0, response.Length);
+                await stream.FlushAsync();
 
                 // Handshake complete, now decode incoming messages.
                 while (!_cts.IsCancellationRequested)
