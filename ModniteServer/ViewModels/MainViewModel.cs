@@ -10,7 +10,7 @@ namespace ModniteServer.ViewModels
 {
     public sealed class MainViewModel : ObservableObject
     {
-        public const int CurrentVersion = 1;
+        public const int CurrentVersion = 2;
 
         private string _title;
         private string _command;
