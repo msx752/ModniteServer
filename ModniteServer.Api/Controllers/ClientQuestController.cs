@@ -30,10 +30,9 @@ namespace ModniteServer.API.Controllers.Profile
 
             var items = account.AthenaItems;
             var itemsFormatted = new Dictionary<string, object>();
-            string favoriteCharacter = "";
             foreach (string item in items)
             {
-                var itemGuid = Guid.NewGuid().ToString();
+                var itemGuid = item; // Makes life easier - config file doesn't store numbers anymore, and it can be read anywhere.
                 itemsFormatted.Add(itemGuid, new
                 {
                     templateId = item,
@@ -48,12 +47,12 @@ namespace ModniteServer.API.Controllers.Profile
                     },
                     quantity = 1
                 });
+            }
 
-                // this is a test
-                if (item.StartsWith("AthenaCharacter"))
-                {
-                    favoriteCharacter = itemGuid;
-                }
+            string[] dances = new string[6];
+            for (int i = 0; i < dances.Length; i++)
+            {
+                dances[i] = account.EquippedItems["favorite_dance" + i];
             }
 
             var response = new
@@ -95,10 +94,10 @@ namespace ModniteServer.API.Controllers.Profile
                                     favorite_consumableemote = "",
                                     banner_color = "defaultcolor1",
                                     favorite_callingcard = "",
-                                    favorite_character = favoriteCharacter,
+                                    favorite_character = account.EquippedItems["favorite_character"],
                                     favorite_spray = new string[0],
                                     book_xp = 0,
-                                    favorite_loadingscreen = "",
+                                    favorite_loadingscreen =  account.EquippedItems["favorite_loadingscreen"],
                                     book_purchased = false,
                                     lifetime_wins = 0,
                                     favorite_hat = "",
@@ -107,16 +106,16 @@ namespace ModniteServer.API.Controllers.Profile
                                     favorite_mapmarker = "",
                                     favorite_vehicledeco = "",
                                     accountLevel = 1000000,
-                                    favorite_backpack = "",
-                                    favorite_dance = new string[0],
+                                    favorite_backpack = account.EquippedItems["favorite_backpack"],
+                                    favorite_dance = dances,
                                     inventory_limit_bonus = 0,
-                                    favorite_skydivecontrail = "",
-                                    favorite_pickaxe = "",
-                                    favorite_glider = "",
+                                    favorite_skydivecontrail = account.EquippedItems["favorite_skydivecontrail"],
+                                    favorite_pickaxe = account.EquippedItems["favorite_pickaxe"],
+                                    favorite_glider = account.EquippedItems["favorite_glider"],
                                     daily_rewards = new { },
                                     xp = 0,
                                     season_friend_match_boost = 0,
-                                    favorite_musicpack = "",
+                                    favorite_musicpack = account.EquippedItems["favorite_musicpack"],
                                     banner_icon = "standardbanner1"
                                 }
                             },

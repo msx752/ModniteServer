@@ -39,5 +39,7 @@ namespace ModniteServer.API.Accounts
         public HashSet<string> AthenaItems { get; set; }
 
         public HashSet<string> CoreItems { get; set; }
+
+        public Dictionary<string, string> EquippedItems { get; set; }
     }
 }

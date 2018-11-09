@@ -59,6 +59,23 @@ namespace ModniteServer
                 "AthenaCharacter:CID_016_Athena_Commando_F",
             };
 
+            EquippedItems = new Dictionary<string, string>
+            {
+                {"favorite_character",""},
+                {"favorite_backpack",""},
+                {"favorite_pickaxe",""},
+                {"favorite_glider",""},
+                {"favorite_skydivecontrail",""},
+                {"favorite_dance0",""},
+                {"favorite_dance1",""},
+                {"favorite_dance2",""},
+                {"favorite_dance3",""},
+                {"favorite_dance4",""},
+                {"favorite_dance5",""},
+                {"favorite_musicpack","" },
+                {"favorite_loadingscreen",""},
+            };
+
             DefaultCoreItems = new HashSet<string>
             {
                 "HomebaseBannerColor:defaultcolor1",
@@ -162,6 +179,11 @@ namespace ModniteServer
         /// Gets or sets the list of banners and colors to give to new accounts.
         /// </summary>
         public HashSet<string> DefaultCoreItems { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of currently equipped items that will be on an account.
+        /// </summary>
+        public Dictionary<string, string> EquippedItems { get; set; }
 
         /// <summary>
         /// Gets or sets whether to log all valid HTTP requests.

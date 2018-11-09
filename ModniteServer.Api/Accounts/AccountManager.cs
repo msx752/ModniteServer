@@ -116,7 +116,8 @@ namespace ModniteServer.API.Accounts
                 AccountId = username,
                 LastLogin = DateTime.UtcNow,
                 AthenaItems = new HashSet<string>(ApiConfig.Current.DefaultAthenaItems),
-                CoreItems = new HashSet<string>(ApiConfig.Current.DefaultCoreItems)
+                CoreItems = new HashSet<string>(ApiConfig.Current.DefaultCoreItems),
+                EquippedItems = new Dictionary<string, string>(ApiConfig.Current.EquippedItems)
             };
 
             string path = Path.Combine(AccountsFolderPath, username) + ".json";

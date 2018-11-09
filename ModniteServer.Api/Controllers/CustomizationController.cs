@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ModniteServer.API.Accounts;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
@@ -73,12 +74,21 @@ namespace ModniteServer.API.Controllers
             }
 
             object profileChange;
+            Account account = AccountManager.GetAccount(accountId);
+
+            if (account.EquippedItems == null)
+                account.EquippedItems = ApiConfig.Current.EquippedItems; // updates previous accounts that don't have that value
+
             if (name == "favorite_dance")
             {
                 // Dances use an array
-                // TODO: Fill in all slots
-
+                string dance = "favorite_dance" + indexWithinSlot;
+                account.EquippedItems[dance] = itemToSlot;
                 string[] slots = new string[6];
+                for (int i = 0; i < slots.Length; i++)
+                {
+                    slots[i] = account.EquippedItems["favorite_dance" + i];
+                }
                 slots[indexWithinSlot] = itemToSlot;
                 profileChange = new
                 {
@@ -89,6 +99,7 @@ namespace ModniteServer.API.Controllers
             }
             else
             {
+                account.EquippedItems[name] = itemToSlot; // add it to equipped items
                 profileChange = new
                 {
                     changeType = "statModified",
