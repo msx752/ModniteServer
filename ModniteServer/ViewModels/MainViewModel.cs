@@ -22,7 +22,7 @@ namespace ModniteServer.ViewModels
         {
             Title = "Modnite Server";
 
-            Log.Information("Modnite Server v1.0-Alpha Preview");
+            Log.Information("Modnite Server v1.1-Alpha");
             Log.Information("Made with ❤️ by the Modnite Contributors");
 
             StartServices();
