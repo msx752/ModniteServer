@@ -30,5 +30,22 @@ namespace ModniteServer.API.Controllers
             Response.ContentType = "application/json";
             Response.Write(JsonConvert.SerializeObject(response));
         }
+
+        [Route("POST", "/fortnite/api/game/v2/profile/*/client/PurchaseCatalogEntry")]
+        public void PurchaseItem()
+        {
+            string accountId = Request.Url.Segments[Request.Url.Segments.Length - 3].Trim('/');
+            Query.TryGetValue("profileId", out string profileId);
+            Query.TryGetValue("rvn", out string rvn);
+
+            var response = new
+            {
+                // TODO
+            };
+
+            Response.StatusCode = 200;
+            Response.ContentType = "application/json";
+            Response.Write(JsonConvert.SerializeObject(response));
+        }
     }
 }
