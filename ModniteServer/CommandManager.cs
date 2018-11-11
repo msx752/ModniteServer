@@ -20,6 +20,7 @@ namespace ModniteServer
                 ["create"] = new CreateAccountCommand(),
                 ["giveitem"] = new GiveItemCommand(),
                 ["getitems"] = new GetItemsCommand(),
+                ["displayname"] = new DisplayNameCommand(),
             };
         }
 
