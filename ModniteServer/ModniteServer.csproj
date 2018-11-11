@@ -85,6 +85,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="CommandManager.cs" />
+    <Compile Include="Commands\DisplayNameCommand.cs" />
     <Compile Include="Commands\GetItemsCommand.cs" />
     <Compile Include="Commands\CreateAccountCommand.cs" />
     <Compile Include="Commands\GiveItemCommand.cs" />
