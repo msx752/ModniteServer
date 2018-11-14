@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 
-namespace ModniteServer.Xmpp.Websockets
+namespace ModniteServer.Websockets
 {
     internal sealed class WebsocketMessageReceivedEventArgs : EventArgs
     {

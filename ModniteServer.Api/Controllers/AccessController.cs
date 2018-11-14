@@ -31,25 +31,21 @@ namespace ModniteServer.API.Controllers
                 int.TryParse(versionInfo.Substring(versionInfo.LastIndexOf('-') + 1), out int build);
                 var version = new Version(major, minor, build);
 
-                string type = "NO_UPDATE";
-
-                if (version < ApiConfig.Current.MinimumVersion)
+                // HACK: Temporary workaround to get matchmaking access in v6.10
+                if (version.Major == 6 && version.Minor == 10)
                 {
-                    Log.Information("Rejected connection from an outdated client {{Version}}{{MinimumVersion}}", version, ApiConfig.Current.MinimumVersion);
-                    type = "HARD_UPDATE"; // HARD_UPDATE | SOFT_UPDATE
+                    var response = new
+                    {
+                        type = "NO_UPDATE" // NO_UPDATE | NOT_ENABLED | SOFT_UPDATE | HARD_UPDATE | APP_REDIRECT
+                    };
+
+                    Response.StatusCode = 200;
+                    Response.ContentType = "application/json";
+                    Response.Write(JsonConvert.SerializeObject(response));
                 }
 
-                //var response = new
-                //{
-                //    type
-                //};
-
-                //Response.StatusCode = 200;
-                //Response.ContentType = "application/json";
-                //Response.Write(JsonConvert.SerializeObject(response));
-
                 // Sending NO_UPDATE will cause the "Game was not launched correctly" error,
-                // so we're telling the client there's nothing.
+                // so we're sending the client nothing.
                 Response.StatusCode = 204;
 
                 return;

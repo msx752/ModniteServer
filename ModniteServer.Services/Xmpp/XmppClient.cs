@@ -40,7 +40,7 @@ namespace ModniteServer.Xmpp
                             Log.Information("[XMPP] Login requested for '" + username + "'");
 
                             var loginSuccessfulResponse = new XElement("iq");
-                            loginSuccessfulResponse.Add(new XAttribute("type", "result"), new XAttribute("id", "_xmpp_auth2"));
+                            loginSuccessfulResponse.Add(new XAttribute("type", "result"), new XAttribute("id", "_xmpp_auth1"));
 
                             Server.SendXmppMessage(Socket, loginSuccessfulResponse);
                             messageHandled = true;
@@ -50,8 +50,14 @@ namespace ModniteServer.Xmpp
 
                 case "close":
                     {
-                        // <close xmlns="urn:ietf:params:xml:ns:xmpp-framing" />
+                        var closeResponse = new XElement("close", new XAttribute("xmlns", "urn:ietf:params:xml:ns:xmpp-framing"));
+                        Server.SendXmppMessage(Socket, closeResponse);
+                        messageHandled = true;
                     }
+                    break;
+
+                case "presence":
+                    // todo
                     break;
             }
 

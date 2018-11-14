@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace ModniteServer.Xmpp.Websockets
+namespace ModniteServer.Websockets
 {
     internal enum MessageType
     {
@@ -110,22 +110,38 @@ namespace ModniteServer.Xmpp.Websockets
             {
                 if (MessageType == MessageType.Text)
                 {
-                    byte[] textBuffer = Encoding.UTF8.GetBytes(TextContent);
+                    writer.Write((byte)0b_1000_0001);
 
-                    if (textBuffer.Length > 0b_0111_1111)
+                    byte[] textBuffer = Encoding.UTF8.GetBytes(TextContent);
+                    if (textBuffer.Length >= 126)
                     {
-                        throw new NotImplementedException("Content larger than 127 bytes is not supported yet");
+                        if (textBuffer.Length > ushort.MaxValue)
+                        {
+                            writer.Write((byte)0b_0111_1111);
+
+                            // TODO: big endian
+                            //writer.Write(textBuffer.Length);
+                            throw new NotImplementedException($"Text content larger than {ushort.MaxValue} is not supported yet");
+                        }
+                        else
+                        {
+                            writer.Write((byte)0b_0111_1110);
+                            writer.Write((byte)((textBuffer.Length & 0xFF00) >> 8));
+                            writer.Write((byte)(textBuffer.Length & 0xFF));
+                        }
+                    }
+                    else
+                    {
+                        writer.Write((byte)textBuffer.Length);
                     }
 
-                    writer.Write((byte)0b_1000_0001);
-                    writer.Write((byte)textBuffer.Length);
                     writer.Write(textBuffer);
                 }
                 else if (MessageType == MessageType.Binary)
                 {
-                    if (BinaryContent.Length > 0b_0111_1111)
+                    if (BinaryContent.Length >= 0b_0111_1110)
                     {
-                        throw new NotImplementedException("Content larger than 127 bytes is not supported yet");
+                        throw new NotImplementedException("Binary content larger than 127 bytes is not supported yet");
                     }
 
                     writer.Write((byte)0b_1000_0010);

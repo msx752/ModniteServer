@@ -1,4 +1,4 @@
-﻿using ModniteServer.Xmpp.Websockets;
+﻿using ModniteServer.Websockets;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -34,7 +34,10 @@ namespace ModniteServer.Xmpp
 
         public ushort Port { get; }
 
-        public void Start() => _server.Start();
+        public void Start()
+        {
+            _server.Start();
+        }
 
         public void Dispose()
         {
@@ -44,12 +47,13 @@ namespace ModniteServer.Xmpp
                 _isDisposed = true;
             }
         }
-
+        
         internal void SendXmppMessage(Socket socket, XElement message)
         {
+            Log.Information("[Xmpp] Sent XMPP message {Message}", message);
             _server.SendMessage(socket, MessageType.Text, Encoding.UTF8.GetBytes(message.ToString()));
         }
-
+        
         private void OnMessageReceived(object sender, WebsocketMessageReceivedEventArgs e)
         {
             var element = XElement.Parse(e.Message.TextContent);

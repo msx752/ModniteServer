@@ -138,9 +138,9 @@
       <Project>{8aa47228-ba31-484f-abb6-c91b5e3ee5be}</Project>
       <Name>ModniteServer.API</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ModniteServer.Xmpp\ModniteServer.Xmpp.csproj">
+    <ProjectReference Include="..\ModniteServer.Services\ModniteServer.Services.csproj">
       <Project>{6959e822-fe2f-4d13-b3ef-2aa7c8d58ea9}</Project>
-      <Name>ModniteServer.Xmpp</Name>
+      <Name>ModniteServer.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

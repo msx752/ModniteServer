@@ -1,4 +1,5 @@
 ﻿using ModniteServer.API;
+using ModniteServer.Matchmaker;
 using ModniteServer.Xmpp;
 using Serilog;
 using System;
@@ -17,6 +18,7 @@ namespace ModniteServer.ViewModels
 
         private ApiServer _apiServer;
         private XmppServer _xmppServer;
+        private MatchmakerServer _matchmakerServer;
 
         public MainViewModel()
         {
@@ -93,7 +95,7 @@ namespace ModniteServer.ViewModels
             var config = ApiConfig.Current;
             ApiConfig.Current.Logger = Log.Logger;
 
-            // Start the API service.
+            // Start the API server.
             _apiServer = new ApiServer(ApiConfig.Current.Port)
             {
                 Logger = Log.Logger,
@@ -113,14 +115,20 @@ namespace ModniteServer.ViewModels
             }
 
             // Start the XMPP service.
-            _xmppServer = new XmppServer(443)
+            _xmppServer = new XmppServer(ApiConfig.Current.XmppPort)
             {
                 Logger = Log.Logger
             };
             _xmppServer.Start();
             Log.Information("XMPP server started on port " + _xmppServer.Port);
 
-            // TODO: Start the matchmaker server.
+            // Start the matchmaker server.
+            _matchmakerServer = new MatchmakerServer(ApiConfig.Current.MatchmakerPort)
+            {
+                Logger = Log.Logger
+            };
+            _matchmakerServer.Start();
+            Log.Information("Matchmaker server started on port " + _matchmakerServer.Port);
 
             // TODO: Start the game server.
         }

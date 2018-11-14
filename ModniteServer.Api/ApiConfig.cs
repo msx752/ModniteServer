@@ -12,6 +12,8 @@ namespace ModniteServer
         public const string ConfigFile = @"\config.json";
 
         public const ushort DefaultApiPort = 60101;
+        public const ushort DefaultXmppPort = 443;
+        public const ushort DefaultMatchmakerPort = 60103;
 
         static ApiConfig()
         {
@@ -41,6 +43,9 @@ namespace ModniteServer
         private ApiConfig()
         {
             Port = DefaultApiPort;
+            XmppPort = DefaultXmppPort;
+            MatchmakerPort = DefaultMatchmakerPort;
+
             AutoCreateAccounts = true;
             MinimumVersionString = "6.10.4464155";
 
@@ -169,6 +174,16 @@ namespace ModniteServer
         /// Gets or sets the port for the API server.
         /// </summary>
         public ushort Port { get; set; }
+
+        /// <summary>
+        /// Gets or sets the port for the XMPP server.
+        /// </summary>
+        public ushort XmppPort { get; set; }
+
+        /// <summary>
+        /// Gets or sets the port for the matchmaker.
+        /// </summary>
+        public ushort MatchmakerPort { get; set; }
 
         /// <summary>
         /// Gets or sets the list of cosmetics, quests, and other items to give to new accounts.

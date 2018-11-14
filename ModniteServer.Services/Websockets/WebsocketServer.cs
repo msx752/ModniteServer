@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ModniteServer.Xmpp.Websockets
+namespace ModniteServer.Websockets
 {
     internal sealed class WebsocketServer : IDisposable
     {
@@ -31,6 +31,8 @@ namespace ModniteServer.Xmpp.Websockets
         }
 
         public event EventHandler<WebsocketMessageReceivedEventArgs> MessageReceived;
+
+        public event EventHandler<WebsocketMessageNewConnectionEventArgs> NewConnection;
 
         public ushort Port { get; }
 
@@ -68,13 +70,28 @@ namespace ModniteServer.Xmpp.Websockets
                 message.BinaryContent = data;
             }
 
-            Log.Information($"Sent {data.Length} bytes {{Client}}{{MessageType}}", socket.RemoteEndPoint.ToString(), messageType);
+            string dataString;
+            if (messageType == MessageType.Text)
+            {
+                dataString = message.TextContent;
+            }
+            else
+            {
+                dataString = BitConverter.ToString(data).Replace("-", " ");
+            }
+
+            Log.Information($"Sent {data.Length} bytes {{Client}}{{MessageType}}{{Message}}", socket.RemoteEndPoint.ToString(), messageType, dataString);
             using (var stream = new NetworkStream(socket, false))
             {
                 byte[] buffer = message.Serialize();
                 stream.Write(buffer, 0, buffer.Length);
                 stream.Flush();
             }
+        }
+
+        internal void SendMessage(Socket socket, MessageType text, object p)
+        {
+            throw new NotImplementedException();
         }
 
         private async Task AcceptConnectionsAsync()
@@ -111,6 +128,7 @@ namespace ModniteServer.Xmpp.Websockets
                 // Sec-WebSocket-Version: 13
 
                 string wsKeyHash = null;
+                string authorization = null;
                 string[] request = Encoding.UTF8.GetString(buffer).Split(new [] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string line in request)
                 {
@@ -119,6 +137,11 @@ namespace ModniteServer.Xmpp.Websockets
                         string wsKey = line.Substring(line.IndexOf(' ') + 1);
                         wsKey += "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"; // magic
                         wsKeyHash = Convert.ToBase64String(SHA1.Create().ComputeHash(Encoding.UTF8.GetBytes(wsKey)));
+                    }
+
+                    if (line.StartsWith("Authorization"))
+                    {
+                        authorization = line.Substring(line.IndexOf(' ') + 1);
                     }
                 }
 
@@ -131,6 +154,13 @@ namespace ModniteServer.Xmpp.Websockets
                 byte[] response = Encoding.UTF8.GetBytes(responseBuilder.ToString());
                 await stream.WriteAsync(response, 0, response.Length);
                 await stream.FlushAsync();
+
+                // Since we'll be using this task to receive incoming messages, we'll raise the
+                // new connection event in a different task.
+                var raiseEventTask = Task.Run(() =>
+                {
+                    NewConnection?.Invoke(this, new WebsocketMessageNewConnectionEventArgs(client, authorization));
+                });
 
                 // Handshake complete, now decode incoming messages.
                 while (!_cts.IsCancellationRequested)
