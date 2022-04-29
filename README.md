@@ -11,9 +11,9 @@ We ❤️ Fortnite and hope this creates an exciting new experience for the game
 
 ✔️ Reach the lobby
 
-▶️ IN PROGRESS: Get into a match alone
+Done by polaris era and rif
 
-➖ Very limited multiplayer support
+➖ Very good multiplayer support
 
 # Releases
 Go to [Releases](https://github.com/ModniteNet/ModniteServer/releases) for compiled binaries.
